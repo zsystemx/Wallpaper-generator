@@ -42,6 +42,7 @@ Wallpaper Generator is a personalized aggregated image generation platform that 
 - ✨ Support manually creating gradient wallpapers
 - ✨ Support setting time intervals and automatic wallpaper change at startup
 - ✨ Daily recommended wallpapers
+- ✨ Dynamic wallpapers: loop local videos/animated images embedded on the desktop, with a cross-platform frame-cycling fallback
 
 ### Compatibility
 - Supports Windows10-Windows11 X64 operating systems
@@ -83,6 +84,20 @@ Wallpaper Generator is a personalized aggregated image generation platform that 
 3. After successfully enabling automatic wallpaper change, you will see a countdown to the next automatic change in the window;
 4. In the system tray at the bottom right of the taskbar, you can right-click and select "Change Wallpaper Now" to skip the current countdown and change the wallpaper immediately (if not visible, it may be hidden - click the upward arrow icon *^* on the far left of the tray area to expand hidden tray icons);
 5. Click "Apply" to save settings, close the window to return to the welcome page.
+
+### How to Use Dynamic Wallpapers
+1. Click the **Dynamic Wallpaper** tab in the top navigation bar of the main window;
+2. Click **Choose** to open a local video (mp4/webm/mkv, etc.) or animated image (GIF/APNG/animated WebP);
+3. The right side will preview playback in real time;
+4. Pick a playback mode:
+   - **Auto (recommended)**: On Windows, prefer desktop-embedded playback (loops behind icons, muted by default); falls back to frame cycling automatically on failure or other systems;
+   - **Desktop embedded**: Windows only;
+   - **Frame cycling**: splits the media into frames and cycles the system wallpaper at the configured FPS (1-15); for videos, installing [ffmpeg](https://ffmpeg.org/) is recommended — otherwise the built-in decoder is used;
+5. Click **Apply Dynamic Wallpaper**; the status line shows the current state;
+6. Click **Stop Dynamic Wallpaper** at any time, or use the tray icon context menu;
+7. Exiting the app stops the dynamic wallpaper (the embedded window dies with the process; frame cycling freezes on the last frame).
+
+> Note: Desktop-embedded playback relies on Windows' undocumented WorkerW interface (the same approach as mainstream live-wallpaper tools). If a Windows update breaks it, switch to frame cycling.
 
 ### How to Provide Feedback
 You can submit an Issue [here](https://github.com/SRInternet-studio/Wallpaper-generator/issues/new). You can also provide feedback via our email srinternet@qq.com.

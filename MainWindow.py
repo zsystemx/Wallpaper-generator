@@ -26,6 +26,7 @@ from UI.Controls import *
 from acw_next import AutoChageWallpaper
 from Kernel import MainKernal, SettingsKernal, APIKernal, MarketKernal, TrayIconKernal
 from Kernel.OsKernal import os
+from UI.DynamicWallpaperPage import DynamicWallpaperPage
 
 from Exception_Handler import setup_global_exception_handler
 handler = setup_global_exception_handler(
@@ -921,6 +922,7 @@ class MainWindow(QWidget, MainWindowTemplate_ui.Ui_Form):
     settings_updated = Signal()  # 设置更新信号
     auto_wallpaper_updated = Signal() # 自动更换壁纸更新信号
     force_wallpaper_update = Signal() # 强制更换壁纸更新信号
+    stop_dynamic_wallpaper = Signal() # 停止动态壁纸信号（托盘）
     
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -946,6 +948,11 @@ class MainWindow(QWidget, MainWindowTemplate_ui.Ui_Form):
         self.widgets = {}
         self.first_page = WelcomePage(self)
         self.addSubInterface(self.first_page, "welcome", "欢迎")
+
+        # 动态壁纸页（欢迎页之后，突出核心功能）
+        self.dynamic_wallpaper_page = DynamicWallpaperPage(self)
+        self.addSubInterface(self.dynamic_wallpaper_page, "dynamic", "动态壁纸", insert_index=1)
+        self.stop_dynamic_wallpaper.connect(self.dynamic_wallpaper_page.stop_requested)
 
         # 3. 加载API配置
         exclude_apis = self.preparSubInterface()
@@ -1069,6 +1076,9 @@ class MainWindow(QWidget, MainWindowTemplate_ui.Ui_Form):
             case "welcome":
                 self.TopMenu.setCurrentItem(self.first_page.objectName())
                 self.OpacityAniStackedWidget.setCurrentWidget(self.first_page)
+            case "dynamic":
+                self.TopMenu.setCurrentItem(self.widgets[page_name].objectName())
+                self.OpacityAniStackedWidget.setCurrentWidget(self.widgets[page_name])
             case "marketplace":
                 self.TopMenu.setCurrentItem(self.widgets[page_name].objectName())
                 self.OpacityAniStackedWidget.setCurrentWidget(self.widgets[page_name])
@@ -1084,6 +1094,13 @@ class MainWindow(QWidget, MainWindowTemplate_ui.Ui_Form):
 
     def _finalize(self):
         try:
+            # 停止动态壁纸（内嵌窗口随进程退出，逐帧轮播停止定时器）
+            if getattr(self, 'dynamic_wallpaper_page', None) is not None:
+                try:
+                    self.dynamic_wallpaper_page.stop_wallpaper(silent=True)
+                except Exception:
+                    logger.debug(traceback.format_exc())
+
             for timer in getattr(self, '_timers', []):
                 timer.stop()
                 

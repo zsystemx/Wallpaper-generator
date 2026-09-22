@@ -52,6 +52,10 @@ class Tray_Form():
         awc_action = Action("立即自动更换", self.parent)
         awc_action.triggered.connect(lambda: self.force_update_wallpaper())
         tray_menu.addAction(awc_action)
+
+        stop_dynamic_action = Action("停止动态壁纸", self.parent)
+        stop_dynamic_action.triggered.connect(lambda: self.stop_dynamic_wallpaper())
+        tray_menu.addAction(stop_dynamic_action)
             
         if sys.platform != "darwin": 
             tray_menu.addSeparator()
@@ -101,3 +105,8 @@ class Tray_Form():
             self.parent.force_wallpaper_update.emit()
         else:
             self.show_notification(title="自动更换壁纸 失败", message="壁纸设置功能目前仅适用于 Windows 系统。")
+
+    def stop_dynamic_wallpaper(self):
+        self.show_notification(title="动态壁纸", message="正在停止动态壁纸……")
+        if hasattr(self.parent, "stop_dynamic_wallpaper"):
+            self.parent.stop_dynamic_wallpaper.emit()
